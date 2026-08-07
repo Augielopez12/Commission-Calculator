@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Commission Dashboard</title>
+    <style>
+        /* Base Variables (Light Mode) */
+        :root {
+            --primary: #2563eb;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --success-bg: #dcfce7;
+            --success-text: #166534;
+            --input-bg: #f8fafc;
+            --result-bg: #f1f5f9;
+        }
+
+        /* Dark Mode Variables */
+        [data-theme="dark"] {
+            --primary: #3b82f6;
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #334155;
+            --success-bg: #064e3b;
+            --success-text: #34d399;
+            --input-bg: #0f172a;
+            --result-bg: #0f172a;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            padding: 20px;
+            margin: 0;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .title-container {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo-placeholder {
+            background: var(--primary);
+            color: white;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin-right: 15px;
+        }
+
+        h1 { margin: 0; font-size: 1.5rem; }
+        h2 { margin-top: 0; font-size: 1.2rem; color: var(--text-main); margin-bottom: 15px; }
+
+        /* Theme Toggle Button */
+        .theme-btn {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .theme-btn:hover {
+            background: var(--border);
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        input, select {
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 1rem;
+            background-color: var(--input-bg);
+            color: var(--text-main);
+            transition: border-color 0.2s, background-color 0.3s, color 0.3s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        /* Results Display Grid */
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .result-box {
+            background: var(--result-bg);
+            padding: 20px;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--border);
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+
+        .result-label { font-size: 0.9rem; color: var(--text-muted); font-weight: 600; }
+        .result-value { font-size: 1.75rem; font-weight: 700; color: var(--text-main); margin-top: 8px; }
+
+        .final-comm { background: var(--success-bg); border-color: var(--success-bg); }
+        .final-comm .result-label { color: var(--success-text); }
+        .final-comm .result-value { color: var(--success-text); }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <div class="title-container">
+                <div class="logo-placeholder">MC</div>
+                <h1>My Commission Dashboard</h1>
+            </div>
+            <button class="theme-btn" id="themeToggle" onclick="toggleTheme()">
+                <span id="themeIcon">🌙</span> Dark
+            </button>
+        </header>
+
+        <!-- Configuration -->
+        <div class="card">
+            <h2>📊 System Configuration</h2>
+            <div class="grid">
+                <div class="input-group">
+                    <label for="sysSize">System Size (kW)</label>
+                    <input type="number" id="sysSize" value="0" step="0.1" placeholder="e.g. 7.2" oninput="calculate()">
+                </div>
+                <div class="input-group">
+                    <label for="ppw">Price Per Watt ($)</label>
+                    <input type="number" id="ppw" value="0" step="0.01" placeholder="e.g. 3.50" oninput="calculate()">
+                </div>
+                <div class="input-group">
+                    <label for="redline">Redline ($/W)</label>
+                    <input type="number" id="redline" value="2.50" step="0.01" oninput="calculate()">
+                </div>
+            </div>
+        </div>
+
+        <!-- Batteries -->
+        <div class="card">
+            <h2>🔋 Battery Selection</h2>
+            <div class="grid">
+                <div class="input-group">
+                    <label for="batteryType">Battery System</label>
+                    <select id="batteryType" onchange="calculate()">
+                        <option value="0">No Battery</option>
+                        <option value="11500">1x Tesla Powerwall 3 ($11,500)</option>
+                        <option value="23000">2x Tesla Powerwall 3 ($23,000)</option>
+                        <option value="10000">1x Enphase 5P ($10,000)</option>
+                        <option value="20000">2x Enphase 5P ($20,000)</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Adders -->
+        <div class="card">
+            <h2>➕ Adders</h2>
+            <div class="grid">
+                <div class="input-group">
+                    <label for="mpu">Main Panel Upgrade ($)</label>
+                    <input type="number" id="mpu" value="0" step="100" placeholder="e.g. 2500" oninput="calculate()">
+                </div>
+                <div class="input-group">
+                    <label for="roofing">Roof Work ($)</label>
+                    <input type="number" id="roofing" value="0" step="100" oninput="calculate()">
+                </div>
+                <div class="input-group">
+                    <label for="trenching">Trenching ($)</label>
+                    <input type="number" id="trenching" value="0" step="100" oninput="calculate()">
+                </div>
+            </div>
+        </div>
+
+        <!-- Calculation Output -->
+        <div class="card">
+            <h2>💰 Commission Calculation</h2>
+            <div class="results-grid">
+                <div class="result-box">
+                    <div class="result-label">System Value</div>
+                    <div class="result-value" id="outSystemValue">$0</div>
+                </div>
+                <div class="result-box">
+                    <div class="result-label">Battery Cost</div>
+                    <div class="result-value" id="outBatteryCost">$0</div>
+                </div>
+                <div class="result-box">
+                    <div class="result-label">Total Adders</div>
+                    <div class="result-value" id="outAdders">$0</div>
+                </div>
+                <div class="result-box final-comm">
+                    <div class="result-label">Final Commission</div>
+                    <div class="result-value" id="outCommission">$0</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- The Calculation Logic & Theme Toggle -->
+    <script>
+        // Dark Mode Logic
+        function toggleTheme() {
+            const body = document.documentElement;
+            const btn = document.getElementById('themeToggle');
+            const icon = document.getElementById('themeIcon');
+
+            if (body.getAttribute('data-theme') === 'dark') {
+                body.removeAttribute('data-theme');
+                icon.innerText = '🌙';
+                btn.innerHTML = '<span id="themeIcon">🌙</span> Dark';
+            } else {
+                body.setAttribute('data-theme', 'dark');
+                btn.innerHTML = '<span id="themeIcon">☀️</span> Light';
+            }
+        }
+
+        // Commission Logic
+        function calculate() {
+            const sysSize = parseFloat(document.getElementById('sysSize').value) || 0;
+            const ppw = parseFloat(document.getElementById('ppw').value) || 0;
+            const redline = parseFloat(document.getElementById('redline').value) || 0;
+            
+            const batteryCost = parseFloat(document.getElementById('batteryType').value) || 0;
+            const mpu = parseFloat(document.getElementById('mpu').value) || 0;
+            const roofing = parseFloat(document.getElementById('roofing').value) || 0;
+            const trenching = parseFloat(document.getElementById('trenching').value) || 0;
+
+            const systemWatts = sysSize * 1000; 
+            const systemValue = systemWatts * ppw;
+            const baseCost = systemWatts * redline;
+            const totalAdders = mpu + roofing + trenching;
+            
+            const finalCommission = systemValue - baseCost - totalAdders - batteryCost;
+
+            const formatter = new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                maximumFractionDigits: 0
+            });
+
+            document.getElementById('outSystemValue').innerText = formatter.format(systemValue);
+            document.getElementById('outBatteryCost').innerText = formatter.format(batteryCost);
+            document.getElementById('outAdders').innerText = formatter.format(totalAdders);
+            document.getElementById('outCommission').innerText = formatter.format(finalCommission);
+        }
+    </script>
+</body>
+</html>
